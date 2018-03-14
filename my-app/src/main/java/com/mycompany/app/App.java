@@ -34,32 +34,44 @@ public class App
 
     public static void main( String[] args ) throws Exception
     {
-        System.out.println( "Hello World2!" );
-
         service = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
         service.setUrl(new URI("https://webmail12.sherwebcloud.com/ews/Exchange.asmx"));
         ExchangeCredentials credentials = new WebCredentials("kosh@test.com", "test");
         service.setCredentials(credentials);
-        getAppointment();
+        updateAppointment();
     }
 
-    public static void getAppointment() throws Exception {
-        String appointmentItemId = "AAMkAGIyMjgxOTBhLTBlNDktNDBjMS04MzhmLTk1ZmZjZDMwNTdlZABGAAAAAAB9kX0vybIWQ49bVQ4OMCu3BwC4okUlG3aRSIhpm7wBBJLhAAAAAAENAAC4okUlG3aRSIhpm7wBBJLhAACxtdz1AAA=";
+    public static void updateAppointment() throws Exception {
+        System.out.println( "Update title to test2!" );
+        String appointmentItemId = "AAMkAGIyMjgxOTBhLTBlNDktNDBjMS04MzhmLTk1ZmZjZDMwNTdlZABGAAAAAAB9kX0vybIWQ49bVQ4OMCu3BwC4okUlG3aRSIhpm7wBBJLhAAAAAAENAAC4okUlG3aRSIhpm7wBBJLhAACxtdz2AAA=";
         Item item = Item.bind(service, new ItemId(appointmentItemId));
-        // Map appointmentData = new HashMap();
+        Map appointmentData = new HashMap();
         Appointment appointment = (Appointment)item;
-        // appointment.setSubject("test2");
-        // appointmentData = readAppointment(appointment);
-        // appointment.update(ConflictResolutionMode.AutoResolve);
-        // System.out.println(appointmentData.get("appointmentSubject"));
+        appointmentData = readAppointment(appointment);
+        System.out.println("original subject: " + appointmentData.get("appointmentSubject"));
+        appointment.setSubject("Test 2");
+        appointmentData = readAppointment(appointment);
+        appointment.update(ConflictResolutionMode.AutoResolve);
+        System.out.println("new subject: " + appointmentData.get("appointmentSubject"));
+        // appointment.delete(DeleteMode.HardDelete);
+    }
+
+    public static void deleteAppointment() throws Exception {
+        System.out.println( "Delete appointment!" );
+        String appointmentItemId = "AAMkAGIyMjgxOTBhLTBlNDktNDBjMS04MzhmLTk1ZmZjZDMwNTdlZABGAAAAAAB9kX0vybIWQ49bVQ4OMCu3BwC4okUlG3aRSIhpm7wBBJLhAAAAAAENAAC4okUlG3aRSIhpm7wBBJLhAACxtdz2AAA=";
+        Item item = Item.bind(service, new ItemId(appointmentItemId));
+        Appointment appointment = (Appointment)item;
         appointment.delete(DeleteMode.HardDelete);
+        System.out.println("Done!");
     }
 
     public static List readAppointments() {
         List apntmtDataList = new ArrayList();
+        // Date startDate = Calendar.getInstance().getTime();
         Calendar now = Calendar.getInstance();
-        Date startDate = Calendar.getInstance().getTime();
-        now.add(Calendar.DATE, 30);
+        now.add(Calendar.DATE, 3);
+        Date startDate = now.getTime();
+        now.add(Calendar.DATE, 1);
         Date endDate = now.getTime();
         try {
             CalendarFolder calendarFolder = CalendarFolder.bind(service, WellKnownFolderName.Calendar, new PropertySet());
@@ -74,9 +86,9 @@ public class App
                 Map appointmentData = new HashMap();
                 appointmentData = readAppointment(appointment);
 
-                System.out.println("subject : " + appointmentData);
                 System.out.println("subject : " + appointmentData.get("appointmentSubject"));
                 System.out.println("On : " + appointmentData.get("appointmentStartTime"));
+                System.out.println("detail : " + appointmentData);
                 apntmtDataList.add(appointmentData);
             }
         } catch (Exception e) {
