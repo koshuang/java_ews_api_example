@@ -1,23 +1,27 @@
 package com.mycompany.app;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.net.URI;
 
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
 import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
+import microsoft.exchange.webservices.data.core.enumeration.service.ConflictResolutionMode;
+import microsoft.exchange.webservices.data.core.enumeration.service.DeleteMode;
 import microsoft.exchange.webservices.data.core.exception.service.local.ServiceLocalException;
 import microsoft.exchange.webservices.data.core.service.folder.CalendarFolder;
 import microsoft.exchange.webservices.data.core.service.item.Appointment;
+import microsoft.exchange.webservices.data.core.service.item.Item;
 import microsoft.exchange.webservices.data.core.service.schema.AppointmentSchema;
 import microsoft.exchange.webservices.data.credential.ExchangeCredentials;
 import microsoft.exchange.webservices.data.credential.WebCredentials;
+import microsoft.exchange.webservices.data.property.complex.ItemId;
 import microsoft.exchange.webservices.data.search.CalendarView;
 import microsoft.exchange.webservices.data.search.FindItemsResults;
 /**
@@ -33,10 +37,22 @@ public class App
         System.out.println( "Hello World2!" );
 
         service = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
-        service.setUrl(new URI("https://webmail12.xxx.com/ews/Exchange.asmx"));
-        ExchangeCredentials credentials = new WebCredentials("email", "password");
+        service.setUrl(new URI("https://webmail12.sherwebcloud.com/ews/Exchange.asmx"));
+        ExchangeCredentials credentials = new WebCredentials("kosh@test.com", "test");
         service.setCredentials(credentials);
-        readAppointments();
+        getAppointment();
+    }
+
+    public static void getAppointment() throws Exception {
+        String appointmentItemId = "AAMkAGIyMjgxOTBhLTBlNDktNDBjMS04MzhmLTk1ZmZjZDMwNTdlZABGAAAAAAB9kX0vybIWQ49bVQ4OMCu3BwC4okUlG3aRSIhpm7wBBJLhAAAAAAENAAC4okUlG3aRSIhpm7wBBJLhAACxtdz1AAA=";
+        Item item = Item.bind(service, new ItemId(appointmentItemId));
+        // Map appointmentData = new HashMap();
+        Appointment appointment = (Appointment)item;
+        // appointment.setSubject("test2");
+        // appointmentData = readAppointment(appointment);
+        // appointment.update(ConflictResolutionMode.AutoResolve);
+        // System.out.println(appointmentData.get("appointmentSubject"));
+        appointment.delete(DeleteMode.HardDelete);
     }
 
     public static List readAppointments() {
@@ -58,6 +74,7 @@ public class App
                 Map appointmentData = new HashMap();
                 appointmentData = readAppointment(appointment);
 
+                System.out.println("subject : " + appointmentData);
                 System.out.println("subject : " + appointmentData.get("appointmentSubject"));
                 System.out.println("On : " + appointmentData.get("appointmentStartTime"));
                 apntmtDataList.add(appointmentData);
