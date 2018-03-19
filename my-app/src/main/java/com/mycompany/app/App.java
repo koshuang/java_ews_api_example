@@ -30,7 +30,7 @@ import microsoft.exchange.webservices.data.search.FindItemsResults;
  */
 public class App
 {
-    private static ExchangeService service;
+    private static ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
 
     public static void main( String[] args ) throws Exception
     {
@@ -39,7 +39,6 @@ public class App
         String password = args[2];
         System.out.println( "Calendar events:" );
 
-        service = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
         service.setUrl(new URI("https://" + server + "/ews/Exchange.asmx"));
         ExchangeCredentials credentials = new WebCredentials(email, password);
         service.setCredentials(credentials);
